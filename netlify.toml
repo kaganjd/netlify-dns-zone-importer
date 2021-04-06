@@ -1,4 +1,5 @@
 [build]
     command = "make build"
+    publish = "build"
 [functions]
     directory = "functions"
