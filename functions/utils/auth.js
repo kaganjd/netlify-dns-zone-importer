@@ -33,7 +33,7 @@ function authInstance(credentials) {
   if (!credentials.client.secret) {
     throw new Error(`MISSING REQUIRED ENV VARS. Please set ${clientSecretKey}`)
   }
-  return simpleOauth.create(credentials)
+  return simpleOauth.createToken(credentials)
 }
 
 module.exports = {

@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import NetlifyAPI from 'netlify'
-import timeAgo from 'time-ago'
 import { csrfToken, parseHash, removeHash } from './utils/auth'
 import loginButton from './assets/netlify-login-button.svg'
 import './App.css'
@@ -72,12 +71,7 @@ export default class App extends Component {
     }
 
     let matchingSites = sites.filter(site => {
-      // No search query. Show all
-      if (!filterText) {
-        return true
-      }
-      // no match!
-      return false
+      return true
     })
     .map((site, i) => {
       const {
@@ -100,7 +94,7 @@ export default class App extends Component {
               target='_blank'
               rel='noopener noreferrer'
             >
-              {account_name}
+              {account_slug}
             </a>
           </div>
         </div>
@@ -137,14 +131,14 @@ export default class App extends Component {
         </h1>
         <div className='contents'>
           <div className='site-wrapper-header'>
-
-              Site Info
-            </div>
             <div
-              className='site-info header'
+              className='site-screenshot-header header'
               data-sort='name'
               onClick={this.handleSort}
-            />
+              title='Click to sort by site name'
+            >
+              Site Info
+            </div>
           </div>
           {this.renderSiteList()}
         </div>
