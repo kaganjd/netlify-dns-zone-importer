@@ -27,6 +27,6 @@ exports.handler = async (event, context) => {
       Location: authorizationURI,
       'Cache-Control': 'no-cache' // Disable caching of this response
     },
-    body: '' // return body for local dev
+    body: ''
   }
 }

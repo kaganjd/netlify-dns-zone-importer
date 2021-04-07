@@ -2,7 +2,6 @@ const querystring = require('querystring')
 const { config, client } = require('./utils/auth')
 const NetlifyAPI = require('netlify')
 
-
 /* Function to handle netlify auth callback */
 exports.handler = async (event, context) => {
   // Exit early
@@ -14,7 +13,6 @@ exports.handler = async (event, context) => {
       })
     }
   }
-
   /* Grant the grant code */
   const code = event.queryStringParameters.code
   /* state helps mitigate CSRF attacks & Restore the previous state of your app */
@@ -22,22 +20,20 @@ exports.handler = async (event, context) => {
 
   try {
     /* Take the grant code and exchange for an accessToken */
-    const token = await client.getToken({
+    const accessToken = await client.getToken({
       code: code,
       redirect_uri: config.redirect_uri,
       client_id: config.clientId,
       client_secret: config.clientSecret
     })
-
+    const token = accessToken.token.access_token
     const ntl = new NetlifyAPI(token)
-    
     const user = await ntl.getCurrentUser()
     const encodedUserData = querystring.stringify({
       email: user.email || "NA",
       full_name: user.full_name || "NA",
       avatar: user.avatar_url || "NA"
     })
-
     const URI = `${state.url}#${encodedUserData}&csrf=${state.csrf}&token=${Buffer.from(token, 'binary').toString('base64')}`
     console.log('URI', URI)
     /* Redirect user to authorizationURI */
@@ -47,10 +43,8 @@ exports.handler = async (event, context) => {
         Location: URI,
         'Cache-Control': 'no-cache' // Disable caching of this response
       },
-      body: '' // return body for local dev
+      body: ''
     }
-
-
   } catch (e) {
     console.log('Access Token Error', e.message)
     console.log(e)
