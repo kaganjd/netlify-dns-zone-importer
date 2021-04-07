@@ -1,6 +1,7 @@
 const querystring = require('querystring')
 const { config, client } = require('./utils/auth')
-const { getUser } = require('./utils/netlify-api')
+const NetlifyAPI = require('netlify')
+
 
 /* Function to handle netlify auth callback */
 exports.handler = async (event, context) => {
@@ -28,18 +29,9 @@ exports.handler = async (event, context) => {
       client_secret: config.clientSecret
     })
 
-    const user = await getUser(token)
-
-    // return {
-    //   statusCode: 200,
-    //   body: JSON.stringify({
-    //     user: user,
-    //     authResult: authResult,
-    //     state: state,
-    //     encode: Buffer.from(token, 'binary').toString('base64')
-    //   })
-    // }
-
+    const ntl = new NetlifyAPI(token)
+    
+    const user = await ntl.getCurrentUser()
     const encodedUserData = querystring.stringify({
       email: user.email || "NA",
       full_name: user.full_name || "NA",
