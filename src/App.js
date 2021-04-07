@@ -63,6 +63,38 @@ export default class App extends Component {
     e.preventDefault()
     window.location.href = `/`
   }
+  encode = data => {
+    return Object.keys(data)
+        .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(data[key]))
+        .join("&")
+  } 
+  handleSubmit = e => {
+    e.preventDefault()
+    fetch('/', {
+      method: 'POST',
+      headers: { "Content-Type": "multipart/form-data" },
+      body: this.encode({
+        "form-name": event.target.getAttribute("name"),
+        ...name
+      })
+    })
+    .then(() => console.log('Form successfully submitted'))
+    .catch((error) => alert(error))
+  }
+  renderZoneFileInput = () => {
+    return (
+        <div className='zone-file-input' >
+          <form method="post" name="zone-importer-with-ntl-form" id="z" data-netlify="true">
+              <label>Zone file</label>
+              <input type="file" name="zone" accept=".txt"/>
+              <button className="primaryButton" onClick={this.handleSubmit}>
+                Submit
+              </button>
+          </form>
+        </div>
+    )
+  }
+
   renderZonesList = () => {
     const { zones, loading } = this.state
 
@@ -74,27 +106,19 @@ export default class App extends Component {
       const {
         account_slug,
         name,
-        records,
         updated_at
       } = zone
-
-      const recordElements = records.map((record) => 
-        <li>record</li>
-      )
       return (
         <div className='zone-wrapper' key={i}>
           <div className='zone-info'>
             <h2>
-              <a href={`https://app.netlify.com/teams/${account_slug}/dns/`} target='_blank' rel='noopener noreferrer'>
+              <a href={`https://app.netlify.com/teams/${account_slug}/dns/${name}`} target='_blank' rel='noopener noreferrer'>
               {name}
               </a>
             </h2>
             <h3>
               updated at {updated_at}
             </h3>
-          </div>
-          <div className='zone-records'>
-            <ul>{recordElements}</ul>
           </div>
         </div>
       )
@@ -132,6 +156,7 @@ export default class App extends Component {
               Zones
             </div>
           </div>
+          {this.renderZoneFileInput()}
           {this.renderZonesList()}
         </div>
       </div>
