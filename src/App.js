@@ -24,7 +24,7 @@ export default class App extends Component {
     /* Set initial app state */
     this.state = {
       user: response,
-      sites: [],
+      zones: [],
       loading: false
     }
   }
@@ -37,15 +37,15 @@ export default class App extends Component {
       loading: true
     })
 
-    /* Fetch sites from netlify API */
+    /* Fetch DNS zones from netlify API */
     const client = new NetlifyAPI(window.atob(user.token))
-    const sites = await client.listSites({
+    const zones = await client.getDnsZones({
       filter: 'all'
     })
 
     /* Set sites and turn off loading state */
     this.setState({
-      sites: sites,
+      zones: zones,
       loading: false
     })
   }
@@ -63,45 +63,42 @@ export default class App extends Component {
     e.preventDefault()
     window.location.href = `/`
   }
-  renderSiteList = () => {
-    const { sites, loading } = this.state
+  renderZonesList = () => {
+    const { zones, loading } = this.state
 
     if (loading) {
-      return <div>Loading sites...</div>
+      return <div>Loading DNS zones...</div>
     }
 
-    let matchingSites = sites.filter(site => {
-      return true
-    })
-    .map((site, i) => {
+    return zones.map((zone, i) => {
       const {
-        name,
         account_slug,
-        admin_url,
-      } = site
+        name,
+        records,
+        updated_at
+      } = zone
+
+      const recordElements = records.map((record) => 
+        <li>record</li>
+      )
       return (
-        <div className='site-wrapper' key={i}>
-          <div className='site-info'>
+        <div className='zone-wrapper' key={i}>
+          <div className='zone-info'>
             <h2>
-              <a href={admin_url} target='_blank' rel='noopener noreferrer'>
-                {name}
+              <a href={`https://app.netlify.com/teams/${account_slug}/dns/`} target='_blank' rel='noopener noreferrer'>
+              {name}
               </a>
             </h2>
+            <h3>
+              updated at {updated_at}
+            </h3>
           </div>
-          <div className='site-team'>
-            <a
-              href={`https://app.netlify.com/teams/${account_slug}/sites/`}
-              target='_blank'
-              rel='noopener noreferrer'
-            >
-              {account_slug}
-            </a>
+          <div className='zone-records'>
+            <ul>{recordElements}</ul>
           </div>
         </div>
       )
     })
-
-    return matchingSites
   }
   render() {
     const { user } = this.state
@@ -110,7 +107,7 @@ export default class App extends Component {
     if (user && !user.token) {
       return (
         <div className='app'>
-          <h1>Netlify Site Search</h1>
+          <h1>Netlify Zone File Uploader</h1>
           <button onClick={this.handleAuth} >
             <img alt='login to netlify' className='login-button' src={loginButton} />
           </button>
@@ -130,17 +127,12 @@ export default class App extends Component {
           </span>
         </h1>
         <div className='contents'>
-          <div className='site-wrapper-header'>
-            <div
-              className='site-screenshot-header header'
-              data-sort='name'
-              onClick={this.handleSort}
-              title='Click to sort by site name'
-            >
-              Site Info
+          <div className='zone-wrapper-header'>
+            <div className='zone-header header'>
+              Zones
             </div>
           </div>
-          {this.renderSiteList()}
+          {this.renderZonesList()}
         </div>
       </div>
     )
