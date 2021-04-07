@@ -3,6 +3,7 @@ import NetlifyAPI from 'netlify'
 import { csrfToken, parseHash, removeHash } from './utils/auth'
 import loginButton from './assets/netlify-login-button.svg'
 import './App.css'
+import ZoneForm from './ZoneForm';
 
 export default class App extends Component {
   constructor(props, context) {
@@ -63,38 +64,6 @@ export default class App extends Component {
     e.preventDefault()
     window.location.href = `/`
   }
-  encode = data => {
-    return Object.keys(data)
-        .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(data[key]))
-        .join("&")
-  } 
-  handleSubmit = e => {
-    e.preventDefault()
-    fetch('/', {
-      method: 'POST',
-      headers: { "Content-Type": "multipart/form-data" },
-      body: this.encode({
-        "form-name": event.target.getAttribute("name"),
-        ...name
-      })
-    })
-    .then(() => console.log('Form successfully submitted'))
-    .catch((error) => alert(error))
-  }
-  renderZoneFileInput = () => {
-    return (
-        <div className='zone-file-input' >
-          <form method="post" name="zone-importer-with-ntl-form" id="z" data-netlify="true">
-              <label>Zone file</label>
-              <input type="file" name="zone" accept=".txt"/>
-              <button className="primaryButton" onClick={this.handleSubmit}>
-                Submit
-              </button>
-          </form>
-        </div>
-    )
-  }
-
   renderZonesList = () => {
     const { zones, loading } = this.state
 
@@ -155,8 +124,8 @@ export default class App extends Component {
             <div className='zone-header header'>
               Zones
             </div>
+            <ZoneForm />
           </div>
-          {this.renderZoneFileInput()}
           {this.renderZonesList()}
         </div>
       </div>
