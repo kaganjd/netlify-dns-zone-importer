@@ -24,9 +24,11 @@ export default class App extends Component {
 
     /* Set initial app state */
     this.state = {
+      accountSlug: '',
       user: response,
-      zones: [],
-      loading: false
+      loading: false,
+      token: response.token,
+      zones: []
     }
   }
   async componentDidMount() {
@@ -38,16 +40,18 @@ export default class App extends Component {
       loading: true
     })
 
-    /* Fetch DNS zones from netlify API */
+    /* Fetch data from netlify API */
     const client = new NetlifyAPI(window.atob(user.token))
     const zones = await client.getDnsZones({
       filter: 'all'
     })
-
+    const accounts = await client.listAccountsForUser()
+    
     /* Set sites and turn off loading state */
     this.setState({
-      zones: zones,
-      loading: false
+      accountSlug: accounts[0].slug,
+      loading: false,
+      zones: zones
     })
   }
   handleAuth = e => {
@@ -94,7 +98,7 @@ export default class App extends Component {
     })
   }
   render() {
-    const { user } = this.state
+    const { user, accountSlug, token } = this.state
 
     /* Not logged in. Show login button */
     if (user && !user.token) {
@@ -124,7 +128,7 @@ export default class App extends Component {
             <div className='zone-header header'>
               Zones
             </div>
-            <ZoneForm />
+            <ZoneForm accountSlug={accountSlug} token={token} />
           </div>
           {this.renderZonesList()}
         </div>
