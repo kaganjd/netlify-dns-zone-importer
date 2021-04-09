@@ -4,28 +4,34 @@ export default class ZoneForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        file: ''
+        fileOut: ''
     };
-    this.handleChange = this.handleChange.bind(this);
+    this.returnFileContents = this.returnFileContents.bind(this)
+    this.handleInput = this.handleInput.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleChange(e) {
-    this.setState({file: e.target.files[0]});
+  handleInput(e) {
+    let reader = new FileReader();
+    reader.onload = r => {
+        this.returnFileContents(r.target.result)
+    };
+    reader.readAsText(e.target.files[0])
+  }
+
+  returnFileContents(f) {
+    this.setState({
+        fileOut: f
+    })
   }
 
   handleSubmit(e) {
     e.preventDefault()
-    const { accountSlug, token } = this.props
-    const { file } = this.state
-    console.log(this.props)
-    var formData = new FormData()
-    formData.append("file", file);
-    formData.append("account", accountSlug)
-    formData.append("token", token)
+    const { fileOut } = this.state
+    console.log(fileOut)
     fetch('https://with-oauth--festive-rosalind-201bbd.netlify.app/.netlify/functions/hello-world', {
         method: 'POST',
-        body: formData
+        body: fileOut
     })
     .then(success => console.log(success))
     .catch(error => alert(error))
@@ -33,14 +39,11 @@ export default class ZoneForm extends Component {
 
   render() {
     return (
-        <div>
-        <div>{this.state.accountSlug}</div>
       <form onSubmit={this.handleSubmit}>
         <label>Zone file:</label>
-        <input type="file" onChange={this.handleChange} />
+        <input type="file" accept=".txt" onChange={this.handleInput} />
         <button type="submit">Submit</button>
       </form>
-      </div>
     );
   }
 }
