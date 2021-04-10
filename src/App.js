@@ -27,7 +27,6 @@ export default class App extends Component {
       accountSlug: '',
       user: response,
       loading: false,
-      token: response.token,
       zones: []
     }
   }
@@ -98,7 +97,7 @@ export default class App extends Component {
     })
   }
   render() {
-    const { user, accountSlug, token } = this.state
+    const { user, accountSlug } = this.state
 
     /* Not logged in. Show login button */
     if (user && !user.token) {
@@ -128,7 +127,7 @@ export default class App extends Component {
             <div className='zone-header header'>
               Zones
             </div>
-            <ZoneForm accountSlug={accountSlug} token={token} />
+            <ZoneForm accountSlug={accountSlug} user={user} />
           </div>
           {this.renderZonesList()}
         </div>
