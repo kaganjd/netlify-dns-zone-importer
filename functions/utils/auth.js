@@ -7,7 +7,7 @@ const TOKEN_HOST = 'https://api.netlify.com'
 const TOKEN_URL =  'https://api.netlify.com/oauth/token'
 const USER_PROFILE_URL = 'https://api.netlify.com/api/v1/user'
 const AUTHORIZATION_URL = 'https://app.netlify.com/authorize'
-const REDIRECT_URL = "https://with-oauth--festive-rosalind-201bbd.netlify.app/.netlify/functions/auth-callback"
+const REDIRECT_URL = `${SITE_URL}/.netlify/functions/auth-callback`
 
 /* Env key name */
 const clientIdKey = 'NETLIFY_OAUTH_CLIENT_ID'

@@ -30,12 +30,11 @@ export default class ZoneForm extends Component {
     e.preventDefault()
     const { fileOut } = this.state
 
-    const postZoneFile = await fetch('https://with-oauth--festive-rosalind-201bbd.netlify.app/.netlify/functions/hello', {
+    const postZoneFile = await fetch("https://festive-rosalind-201bbd.netlify.app/.netlify/functions/zonefileparser", {
       method: 'POST',
       body: fileOut
     })
     const response = await postZoneFile.json();
-
     this.setState({
       parserResponse: response
     })
@@ -46,42 +45,51 @@ export default class ZoneForm extends Component {
     const { user } = this.props
     const client = new NetlifyAPI(window.atob(user.token))
 
-    // POST request
-    const response = await client.createDnsRecord({
-      zone_id: zone.id,
-      body: {
-        type: type,
-        hostname: hostname,
-        value: value,
-        ttl: ttl
-      }
-    })
-    console.log(response)
+    try {
+      // POST request
+      const response = await client.createDnsRecord({
+        zone_id: zone.id,
+        body: {
+          type: type,
+          hostname: hostname,
+          value: value,
+          ttl: ttl
+        }
+      })
+      console.log(response)
+      alert(`Successfully created DNS record ✨`)
+    } catch (error) {
+      alert(error)
+    }
   }
 
   async createZone(hostname) {
     const { accountSlug, user } = this.props
     const client = new NetlifyAPI(window.atob(user.token))
 
-    // POST request
-    const response = await client.createDnsZone({
-      body: {
-        account_slug: accountSlug,
-        name: hostname
-      }
-    })
-    console.log(response)
-    
-    // set state based on response
-    this.setState({
-      zone: response
-    })
+    try {
+      // POST request
+      const response = await client.createDnsZone({
+        body: {
+          account_slug: accountSlug,
+          name: hostname
+        }
+      })
+      console.log(response)
+      // set state based on response
+      this.setState({
+        zone: response
+      })
+      alert(`Successfully created DNS zone for ${hostname} 🚀`)
+    } catch (error) {
+      alert(error)
+    }
   }
 
   renderZoneFileForm() {
     return (
         <form onSubmit={this.handleSubmit}>
-          <label>Zone file:</label>
+          <label>Upload your zone file:</label>
           <input type="file" accept=".txt" onChange={this.handleInput} />
           <button type="submit">Submit</button>
         </form>

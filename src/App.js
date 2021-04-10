@@ -8,7 +8,6 @@ import ZoneForm from './ZoneForm';
 export default class App extends Component {
   constructor(props, context) {
     super(props, context)
-    console.log('window.location.hash', window.location.hash)
     const response = parseHash(window.location.hash)
     /* Clear hash */
     removeHash()
@@ -34,19 +33,16 @@ export default class App extends Component {
     const { user } = this.state
     if (!user.token) return
 
-    /* Set request loading state */
     this.setState({
       loading: true
     })
 
-    /* Fetch data from netlify API */
     const client = new NetlifyAPI(window.atob(user.token))
     const zones = await client.getDnsZones({
       filter: 'all'
     })
     const accounts = await client.listAccountsForUser()
     
-    /* Set sites and turn off loading state */
     this.setState({
       accountSlug: accounts[0].slug,
       loading: false,
@@ -66,35 +62,6 @@ export default class App extends Component {
   handleLogout = e => {
     e.preventDefault()
     window.location.href = `/`
-  }
-  renderZonesList = () => {
-    const { zones, loading } = this.state
-
-    if (loading) {
-      return <div>Loading DNS zones...</div>
-    }
-
-    return zones.map((zone, i) => {
-      const {
-        account_slug,
-        name,
-        updated_at
-      } = zone
-      return (
-        <div className='zone-wrapper' key={i}>
-          <div className='zone-info'>
-            <h2>
-              <a href={`https://app.netlify.com/teams/${account_slug}/dns/${name}`} target='_blank' rel='noopener noreferrer'>
-              {name}
-              </a>
-            </h2>
-            <h3>
-              updated at {updated_at}
-            </h3>
-          </div>
-        </div>
-      )
-    })
   }
   render() {
     const { user, accountSlug } = this.state
@@ -123,13 +90,7 @@ export default class App extends Component {
           </span>
         </h1>
         <div className='contents'>
-          <div className='zone-wrapper-header'>
-            <div className='zone-header header'>
-              Zones
-            </div>
-            <ZoneForm accountSlug={accountSlug} user={user} />
-          </div>
-          {this.renderZonesList()}
+          <ZoneForm accountSlug={accountSlug} user={user} />
         </div>
       </div>
     )
