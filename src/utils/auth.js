@@ -3,10 +3,11 @@
  * @return {String} - uuidv4
  */
 export function csrfToken() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8) // eslint-disable-line
-    return v.toString(16)
-  })
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == "x" ? r : (r & 0x3) | 0x8; // eslint-disable-line
+    return v.toString(16);
+  });
 }
 
 /**
@@ -15,12 +16,15 @@ export function csrfToken() {
  * @return {Object} parsed key value object
  */
 export function parseHash(hash) {
-  if (!hash) return {}
-  return hash.replace(/^#/, '').split('&').reduce((result, pair) => {
-    const keyValue = pair.split('=')
-    result[keyValue[0]] = decode(keyValue[1])
-    return result
-  }, {})
+  if (!hash) return null;
+  return hash
+    .replace(/^#/, "")
+    .split("&")
+    .reduce((result, pair) => {
+      const keyValue = pair.split("=");
+      result[keyValue[0]] = decode(keyValue[1]);
+      return result;
+    }, {});
 }
 
 /**
@@ -28,11 +32,15 @@ export function parseHash(hash) {
  * @return {null}
  */
 export function removeHash() {
-  const { history, location } = window
-  document.location.hash = ''
-  history.pushState("", document.title, `${location.pathname}${location.search}`)
+  const { history, location } = window;
+  document.location.hash = "";
+  history.pushState(
+    "",
+    document.title,
+    `${location.pathname}${location.search}`
+  );
 }
 
 function decode(s) {
-  return decodeURIComponent(s).replace(/\+/g, ' ')
+  return decodeURIComponent(s).replace(/\+/g, " ");
 }

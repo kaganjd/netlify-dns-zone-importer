@@ -1,98 +1,93 @@
-import React, { Component } from 'react'
-import NetlifyAPI from 'netlify'
-import { csrfToken, parseHash, removeHash } from './utils/auth'
-import loginButton from './assets/netlify-login-button.svg'
-import './App.css'
-import ZoneForm from './ZoneForm';
+import React, { useState, useEffect } from "react";
+import NetlifyAPI from "netlify";
+import { csrfToken, parseHash, removeHash } from "./utils/auth";
+import loginButton from "./assets/netlify-login-button.svg";
+import "./App.css";
+import ZoneForm from "./ZoneForm";
 
-export default class App extends Component {
-  constructor(props, context) {
-    super(props, context)
-    const response = parseHash(window.location.hash)
-    /* Clear hash */
-    removeHash()
+const App = (props) => {
+  // authed response is a hashed url from auth-callback that includes:
+  // - email
+  // - full_name
+  // - avatar
+  // - csrf
+  // - token
+  const response = parseHash(window.location.hash);
+  console.log("response: ", response);
+  removeHash();
 
-    /* Protect against csrf (cross site request forgery https://bit.ly/1V1AvZD) */
-    if (response.token && !localStorage.getItem(response.csrf)) {
-      alert('Token invalid. Please try to login again')
-      return
+  const [accountSlug, setAccountSlug] = useState(null);
+  const [user, setUser] = useState(response);
+  // const [zones, setZones] = useState([])
+
+  useEffect(() => {
+    async function netlifyFetch() {
+      const client = new NetlifyAPI(window.atob(user.token));
+      // const zoneResponse = await client.getDnsZones({
+      //   filter: 'all'
+      // })
+      // setZones(zoneResponse)
+      const accountsResponse = await client.listAccountsForUser();
+      setAccountSlug(accountsResponse[0].slug);
     }
 
-    /* Clean up csrfToken */
-    localStorage.removeItem(response.csrf)
-
-    /* Set initial app state */
-    this.state = {
-      accountSlug: '',
-      user: response,
-      loading: false,
-      zones: []
+    if (user) {
+      if (!localStorage.getItem(user.csrf)) {
+        alert("Token invalid. Please try to login again.");
+        setUser(null);
+        return;
+      } else {
+        localStorage.removeItem(user.csrf);
+        netlifyFetch();
+      }
     }
-  }
-  async componentDidMount() {
-    const { user } = this.state
-    if (!user.token) return
+  }, [user]);
 
-    this.setState({
-      loading: true
-    })
+  const handleAuth = (e) => {
+    e.preventDefault();
+    const state = csrfToken();
+    const { location, localStorage } = window;
+    localStorage.setItem(state, "true");
+    const redirectTo = `${location.origin}${location.pathname}`;
+    window.location.href = `/.netlify/functions/auth-start?url=${redirectTo}&csrf=${state}`;
+  };
 
-    const client = new NetlifyAPI(window.atob(user.token))
-    const zones = await client.getDnsZones({
-      filter: 'all'
-    })
-    const accounts = await client.listAccountsForUser()
-    
-    this.setState({
-      accountSlug: accounts[0].slug,
-      loading: false,
-      zones: zones
-    })
-  }
-  handleAuth = e => {
-    e.preventDefault()
-    const state = csrfToken()
-    const { location, localStorage } = window
-    /* Set csrf token */
-    localStorage.setItem(state, 'true')
-    /* Do redirect */
-    const redirectTo = `${location.origin}${location.pathname}`
-    window.location.href = `/.netlify/functions/auth-start?url=${redirectTo}&csrf=${state}`
-  }
-  handleLogout = e => {
-    e.preventDefault()
-    window.location.href = `/`
-  }
-  render() {
-    const { user, accountSlug } = this.state
+  const handleLogout = (e) => {
+    e.preventDefault();
+    window.location.href = `/`;
+  };
 
-    /* Not logged in. Show login button */
-    if (user && !user.token) {
-      return (
-        <div className='app'>
-          <h1>Netlify Zone File Uploader</h1>
-          <button onClick={this.handleAuth} >
-            <img alt='login to netlify' className='login-button' src={loginButton} />
-          </button>
-        </div>
-      )
-    }
-
-    /* Show admin UI */
+  /* Not logged in. Show login button */
+  if (!user) {
     return (
-      <div className='app'>
-        <h1>
-          <span className='title-inner'>
-            Hi {user.full_name || 'Friend'}
-            <button className='primary-button' onClick={this.handleLogout}>
-              Logout
-            </button>
-          </span>
-        </h1>
-        <div className='contents'>
-          <ZoneForm accountSlug={accountSlug} user={user} />
-        </div>
+      <div className="app">
+        <h1>Netlify Zone File Uploader</h1>
+        <button onClick={handleAuth}>
+          <img
+            alt="login to netlify"
+            className="login-button"
+            src={loginButton}
+          />
+        </button>
       </div>
-    )
+    );
   }
-}
+
+  return (
+    <div className="app">
+      <h1>
+        <span className="title-inner">
+          Hi {user.full_name || "Friend"}
+          <button className="primary-button" onClick={handleLogout}>
+            Logout
+          </button>
+        </span>
+      </h1>
+      <div className="contents">
+        <ZoneForm accountSlug={accountSlug} user={user} />
+      </div>
+    </div>
+  );
+};
+
+export default App;
