@@ -1,70 +1,53 @@
-# Getting Started with Create React App
+# Netlify zone file importer
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+0. Go to https://gallant-leavitt-d4e050.netlify.app/
+1. Log in with Netlify
+2. Upload your zone file
+3. Create a DNS zone for your origin domain
+4. Create DNS records
 
-## Available Scripts
+## What's a zone file?
 
-In the project directory, you can run:
+There are many examples scattered across the internet. Here's one:
 
-### `yarn start`
+```
+$ORIGIN flowers.horse.
+@                      3600 SOA   ns1.p30.dynect.net. (
+                              zone-admin.dyndns.com.     ; address of responsible party
+                              2016072701                 ; serial number
+                              3600                       ; refresh period
+                              600                        ; retry period
+                              604800                     ; expire time
+                              1800                     ) ; minimum ttl
+		      86400 NS    ns1.p30.dynect.net.
+                      86400 NS    ns2.p30.dynect.net.
+                      86400 NS    ns3.p30.dynect.net.
+                      86400 NS    ns4.p30.dynect.net.
+                       3600 MX    10 mail.flowers.horse.
+                       3600 MX    20 vpn.flowers.horse.
+                       3600 MX    30 mail.flowers.horse.
+                         60 A     204.13.248.106
+                       3600 TXT   "v=spf1 includespf.dynect.net ~all"
+mail                  14400 A     204.13.248.106
+vpn                      60 A     216.146.45.240
+webapp                   60 A     216.146.46.10
+webapp                   60 A     216.146.46.11
+www                   43200 CNAME flowers.horse.
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+This app expects you to upload a .txt file, so if your zone file doesn't have an extension, you'll need to add .txt to the end.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## What about my SOA record?
 
-### `yarn test`
+Netlify doesn't support creating SOA records, so the app won't show you an SOA record even if it was in the zone file.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## What about this [silent failure, weird UI thing, unhandled case]?
 
-### `yarn build`
+There are many! This is a work in progress. Please file an issue and I'll take a look :)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Thanks
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- @futuregerald for guidance
+- Zone file parsing: https://github.com/wpalmer/gozone (my fork with a bug fix: https://github.com/kaganjd/gozone)
+- OAuth: https://github.com/netlify-labs/oauth-example
+- This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app)
