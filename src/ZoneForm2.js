@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import NetlifyAPI from "netlify";
 
 const ZoneForm = (props) => {
@@ -6,7 +6,7 @@ const ZoneForm = (props) => {
   const [parserResponse, setParserResponse] = useState(null);
   const [zone, setZone] = useState(null);
 
-  const client = new NetlifyAPI(window.atob(props.user.token));
+  const client = new NetlifyAPI(window.atob(user.token));
 
   const handleInput = (e) => {
     let reader = new FileReader();
@@ -25,11 +25,13 @@ const ZoneForm = (props) => {
         body: fileOut,
       }
     );
-    response = await response.json();
+    response = await postZoneFile.json();
     setParserResponse(response);
   };
 
   const createRecord = async (hostname, type, ttl, value) => {
+    const { user } = props;
+
     try {
       // POST request
       let response = await client.createDnsRecord({
@@ -49,11 +51,13 @@ const ZoneForm = (props) => {
   };
 
   const createZone = async (hostname) => {
+    const { accountSlug, user } = props;
+
     try {
       // POST request
       let response = await client.createDnsZone({
         body: {
-          account_slug: props.accountSlug,
+          account_slug: accountSlug,
           name: hostname,
         },
       });
@@ -94,7 +98,7 @@ const ZoneForm = (props) => {
   };
 
   if (!parserResponse) {
-    return <div>{renderZoneFileForm()}</div>;
+    return <div>{renderZoneFileForm}</div>;
   }
 
   return (

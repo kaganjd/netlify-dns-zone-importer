@@ -13,7 +13,6 @@ const App = (props) => {
   // - csrf
   // - token
   const response = parseHash(window.location.hash);
-  console.log("response: ", response);
   removeHash();
 
   const [accountSlug, setAccountSlug] = useState(null);
