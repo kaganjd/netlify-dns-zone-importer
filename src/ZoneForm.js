@@ -18,13 +18,10 @@ const ZoneForm = (props) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let response = await fetch(
-      "https://festive-rosalind-201bbd.netlify.app/.netlify/functions/zonefileparser",
-      {
-        method: "POST",
-        body: fileOut,
-      }
-    );
+    let response = await fetch("/.netlify/functions/zonefileparser", {
+      method: "POST",
+      body: fileOut,
+    });
     response = await response.json();
     setParserResponse(response);
   };
