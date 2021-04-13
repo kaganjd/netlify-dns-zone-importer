@@ -103,7 +103,7 @@ const ZoneForm = (props) => {
       <button onClick={() => createZone(parserResponse.name)}>
         Create zone
       </button>
-      <div>{renderRecordsList}</div>
+      <div>{renderRecordsList()}</div>
     </div>
   );
 };

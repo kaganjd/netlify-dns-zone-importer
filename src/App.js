@@ -17,15 +17,10 @@ const App = (props) => {
 
   const [accountSlug, setAccountSlug] = useState(null);
   const [user, setUser] = useState(response);
-  // const [zones, setZones] = useState([])
 
   useEffect(() => {
     async function netlifyFetch() {
       const client = new NetlifyAPI(window.atob(user.token));
-      // const zoneResponse = await client.getDnsZones({
-      //   filter: 'all'
-      // })
-      // setZones(zoneResponse)
       const accountsResponse = await client.listAccountsForUser();
       setAccountSlug(accountsResponse[0].slug);
     }
